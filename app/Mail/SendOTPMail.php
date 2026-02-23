@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Mail;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Queue\SerializesModels;
+
+class SendOTPMail extends Mailable
+{
+    use Queueable, SerializesModels;
+
+    public $otp; // Variabel untuk menampung kode OTP
+
+    public function __construct($otp)
+    {
+        $this->otp = $otp;
+    }
+
+    public function envelope(): Envelope
+    {
+        return new Envelope(
+            subject: 'Kode OTP Login Anda',
+        );
+    }
+
+    public function content(): Content
+    {
+        return new Content(
+            view: 'emails.otp', // Lokasi file blade email
+        );
+    }
+}
