@@ -11,7 +11,7 @@
     <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
       <span class="mdi mdi-menu"></span>
     </button>
-    
+
     <ul class="navbar-nav navbar-nav-right">
       <li class="nav-item nav-profile dropdown">
         <a class="nav-link dropdown-toggle" id="profileDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
@@ -22,12 +22,12 @@
           <div class="nav-profile-text">
             <p class="mb-1 text-black">{{ Auth::user()->name }}</p> </div>
         </a>
-        
+
         <div class="dropdown-menu navbar-dropdown" aria-labelledby="profileDropdown">
           <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="{{ route('logout') }}" 
+          <a class="dropdown-item" href="{{ route('logout') }}"
              onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-            <i class="mdi mdi-logout me-2 text-primary"></i> Signout 
+            <i class="mdi mdi-logout me-2 text-primary"></i> Signout
           </a>
           <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
               @csrf
@@ -35,7 +35,7 @@
         </div>
       </li>
     </ul>
-    
+
     <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
       <span class="mdi mdi-menu"></span>
     </button>

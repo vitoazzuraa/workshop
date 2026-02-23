@@ -7,7 +7,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class PDFController extends Controller
 {
-    // 1. Generate Sertifikat (Landscape A4)
     public function generateSertifikat()
     {
         $data = [
@@ -17,22 +16,21 @@ class PDFController extends Controller
         ];
 
         $pdf = Pdf::loadView('pdf.sertifikat', $data)
-                  ->setPaper('a4', 'landscape'); // Set Landscape A4
+                  ->setPaper('a4', 'landscape');
 
         return $pdf->download('sertifikat.pdf');
     }
 
-    // 2. Generate Undangan (Portrait A4)
     public function generateUndangan()
     {
         $data = [
             'nomor' => '123/B/DST/UA.VOKASI/2026',
             'tanggal' => '28 Februari 2026',
-            'agenda' => 'Undangan Pertemuan'
+            'agenda' => 'Rapat Koordinasi Evaluasi Tahunan'
         ];
 
         $pdf = Pdf::loadView('pdf.undangan', $data)
-                  ->setPaper('a4', 'portrait'); // Set Portrait A4
+                  ->setPaper('a4', 'portrait');
 
         return $pdf->download('undangan.pdf');
     }

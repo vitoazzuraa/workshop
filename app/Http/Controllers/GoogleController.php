@@ -42,10 +42,11 @@ class GoogleController extends Controller
                         'id_google' => $userGoogle->id,
                         'password' => bcrypt(Str::random(16)),
                     ]);
+                    $targetUser = $newUser;
                 }
             }
 
-            $otpCode = strtoupper(Str::random(6));
+            $otpCode = rand(100000, 999999);
 
             $targetUser->update([
                 'otp' => $otpCode
