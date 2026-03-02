@@ -21,19 +21,26 @@
       </a>
     </li>
 
+    <li class="nav-item {{ Request::is('barang*') ? 'active' : '' }}">
+      <a class="nav-link" href="{{ route('barang.index') }}">
+        <span class="menu-title">Manajemen Barang</span>
+        <i class="mdi mdi-cube-outline menu-icon"></i>
+      </a>
+    </li>
+
     <li class="nav-item">
         <hr style="border-top: 1px solid rgba(255,255,255,0.2); margin: 10px 20px;">
     </li>
 
     <li class="nav-item {{ Request::is('download-sertifikat') ? 'active' : '' }}">
-      <a class="nav-link" href="{{ url('/download-sertifikat') }}">
+      <a class="nav-link" href="{{ route('pdf.sertifikat') }}">
         <span class="menu-title">Cetak Sertifikat</span>
         <i class="mdi mdi-certificate menu-icon"></i>
       </a>
     </li>
 
     <li class="nav-item {{ Request::is('download-undangan') ? 'active' : '' }}">
-      <a class="nav-link" href="{{ url('/download-undangan') }}">
+    <a class="nav-link" href="{{ route('pdf.undangan') }}">
         <span class="menu-title">Cetak Undangan</span>
         <i class="mdi mdi-email-outline menu-icon"></i>
       </a>

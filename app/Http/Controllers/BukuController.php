@@ -11,9 +11,14 @@ class BukuController extends Controller
     public function index()
     {
         $buku = Buku::with('kategori')->get();
-        $kategori = Kategori::all();
 
-        return view('pages.buku.index', compact('buku', 'kategori'));
+        return view('pages.buku.index', compact('buku'));
+    }
+
+    public function create()
+    {
+        $kategori = Kategori::all();
+        return view('pages.buku.create', compact('kategori'));
     }
 
     public function store(Request $request)
@@ -48,7 +53,7 @@ class BukuController extends Controller
 
     public function destroy($idbuku)
     {
-        $buku = Kategori::findOrFail($idbuku);
+        $buku = Buku::findOrFail($idbuku);
         $buku->delete();
         return redirect()->route('buku.index')->with('success', 'Buku berhasil dihapus');
     }

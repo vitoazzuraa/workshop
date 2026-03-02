@@ -14,6 +14,7 @@ class Buku extends Model
         'pengarang',
         'idkategori'
     ];
+
     public $timestamps = false;
 
     public function kategori()

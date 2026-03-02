@@ -13,6 +13,11 @@ class KategoriController extends Controller
         return view('pages.kategori.index', compact('kategori'));
     }
 
+    public function create()
+    {
+        return view('pages.kategori.create');
+    }
+
     public function store(Request $request)
     {
         $request->validate([

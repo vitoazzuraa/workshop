@@ -8,7 +8,7 @@
         <img src="{{ asset('assets/images/logo.svg') }}" alt="logo">
       </div>
       <h4 class="text-center">Selamat Datang!</h4>
-      <h6 class="font-weight-light text-center">Silakan login untuk masuk ke perpustakaan.</h6>
+      <h6 class="font-weight-light text-center">Silakan login untuk masuk.</h6>
 
       <form class="pt-3" method="POST" action="{{ route('login') }}">
         @csrf

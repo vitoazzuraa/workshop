@@ -8,7 +8,10 @@ class Kategori extends Model
 {
     protected $primaryKey = 'idkategori';
 
-    protected $fillable = ['nama_kategori'];
+    protected $fillable = [
+        'nama_kategori'
+    ];
+
     public $timestamps = false;
 
     public function buku()

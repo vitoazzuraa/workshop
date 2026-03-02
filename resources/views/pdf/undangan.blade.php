@@ -13,7 +13,7 @@
         .container {
             padding: 1.5cm 2.5cm;
         }
-        
+
         .kop {
             text-align: center;
             border-bottom: 3px solid #000;
@@ -54,11 +54,11 @@
             </tr>
         </table>
 
-        <p>Yth. Bapak/Ibu Dosen dan Staf Pengelola<br>Fakultas Vokasi UNAIR<br>Di Tempat</p>
+        <p>Yth. Bapak/Ibu Dosen<br>Fakultas Vokasi UNAIR<br>Di Tempat</p>
 
         <div class="isi">
             <p>Dengan hormat,</p>
-            <p>Sehubungan dengan dimulainya koordinasi rutin program kerja semester, kami mengundang Bapak/Ibu untuk hadir dalam rapat bersama yang akan membahas agenda penting mengenai pengembangan sistem informasi perpustakaan digital.</p>
+            <p>Sehubungan dengan acara pemilihan Ketua Himpunan Mahasiswa Teknik Informatika 2026</p>
 
             <p>Pertemuan tersebut akan dilaksanakan pada:</p>
             <table class="tabel-data">
@@ -84,7 +84,7 @@
                 <td width="60%"></td>
                 <td align="center">
                     Hormat kami,<br>
-                    <strong>Ketala Pelaksana</strong>
+                    <strong>Ketua Pelaksana</strong>
                     <br><br><br><br>
                     <strong><u>Christianus Primavito</u></strong><br>
                     Fakultas Vokasi Unair

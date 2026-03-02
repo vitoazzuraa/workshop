@@ -1,89 +1,51 @@
 @extends('layouts.master')
-@section('title', 'Manajemen Buku')
+@section('title', 'Tambah Buku')
 
 @section('content')
 <div class="row">
     <div class="col-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">Tambah Koleksi Buku</h4>
-            <form class="forms-sample" action="{{ route('buku.store') }}" method="POST">
-                @csrf
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label>Kode Buku</label>
-                            <input type="text" name="kode" class="form-control" placeholder="NV-01" required>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label>Judul Buku</label>
-                            <input type="text" name="judul" class="form-control" placeholder="Judul" required>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label>Pengarang</label>
-                            <input type="text" name="pengarang" class="form-control" placeholder="Nama Pengarang" required>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label>Kategori</label>
-                            <select name="idkategori" class="form-control" required>
-                                <option value="">Pilih Kategori</option>
-                                @foreach($kategori as $k)
-                                    <option value="{{ $k->idkategori }}">{{ $k->nama_kategori }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-gradient-primary btn-fw">Simpan Koleksi</button>
-                    </div>
-                </div>
-            </form>
-            </div>
-        </div>
-    </div>
+                <h4 class="card-title">Input Koleksi Buku Baru</h4>
+                <p class="card-description"> Masukkan detail informasi buku di bawah ini. </p>
 
-    <div class="col-12 grid-margin stretch-card">
-        <div class="card">
-            <div class="card-body">
-                <h4 class="card-title">Data Buku</h4>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th> Kode </th>
-                            <th> Judul </th>
-                            <th> Pengarang </th>
-                            <th> Kategori </th>
-                            <th> Aksi </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($buku as $b)
-                        <tr>
-                            <td> {{ $b->kode }} </td>
-                            <td> {{ $b->judul }} </td>
-                            <td> {{ $b->pengarang }} </td>
-                            <td> <label class="badge badge-info">{{ $b->kategori->nama_kategori }}</label> </td>
-                            <td>
-                                <a href="{{ route('buku.edit', $b->idbuku) }}" class="btn btn-sm btn-warning">Edit</a>
+                <form class="forms-sample" action="{{ route('buku.store') }}" method="POST">
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Kode Buku</label>
+                                <input type="text" name="kode" class="form-control" placeholder="Contoh: NV-01" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Kategori</label>
+                                <select name="idkategori" class="form-control" required>
+                                    <option value="">-- Pilih Kategori --</option>
+                                    @foreach($kategori as $k)
+                                        <option value="{{ $k->idkategori }}">{{ $k->nama_kategori }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
 
-                                <form action="{{ route('buku.destroy', $b->idbuku) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
-                                </form>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                    <div class="form-group">
+                        <label>Judul Buku</label>
+                        <input type="text" name="judul" class="form-control" placeholder="Masukkan Judul Lengkap" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Pengarang</label>
+                        <input type="text" name="pengarang" class="form-control" placeholder="Nama Penulis" required>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-gradient-primary me-2">Simpan Buku</button>
+                        <a href="{{ route('buku.index') }}" class="btn btn-light">Batal</a>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

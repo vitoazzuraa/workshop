@@ -12,7 +12,7 @@ class SendOTPMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $otp; // Variabel untuk menampung kode OTP
+    public $otp;
 
     public function __construct($otp)
     {
@@ -29,7 +29,7 @@ class SendOTPMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.otp', // Lokasi file blade email
+            view: 'emails.otp',
         );
     }
 }

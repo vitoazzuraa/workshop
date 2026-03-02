@@ -15,11 +15,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        for ($i = 1; $i <= 10; $i++) {
+            \App\Models\Barang::create([
+                'nama' => "Barang Contoh $i",
+                'harga' => rand(1000, 50000),
+                'timestamp' => now(),
+            ]);
+        }
     }
 }
