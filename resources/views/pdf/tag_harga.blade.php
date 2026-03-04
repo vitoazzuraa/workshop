@@ -3,18 +3,17 @@
 <head>
     <style>
         @page {
-            margin: 1mm 2mm 1mm 2mm;
+            margin:1mm 2mm 1mm 2mm;
         }
 
         body {
-            margin: 0;
-            font-family: Helvetica, Arial, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10px;
         }
 
         table {
             border-collapse: separate;
             border-spacing: 2mm 1mm;
-            width: 198mm; /* 190 + 8 */
         }
 
         td {
@@ -23,7 +22,6 @@
             border: 0.2mm solid #ccc;
             text-align: center;
             vertical-align: middle;
-            padding: 1mm;
             box-sizing: border-box;
         }
     </style>
@@ -41,10 +39,10 @@
                 <td>
                     @if($label)
                         <span class="name">{{ $label->nama }}</span>
+                        <br>
                         <span class="price">
                             Rp {{ number_format($label->harga, 0, ',', '.') }}
                         </span>
-                        <span class="sku">{{ $label->id_barang }}</span>
                     @endif
                 </td>
             @endfor

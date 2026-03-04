@@ -62,22 +62,21 @@ class BarangController extends Controller
 
     $selectedBarang = Barang::whereIn('id_barang', $ids)->get();
 
-    // Hitung posisi mulai: ((Baris - 1) * 5 Kolom) + (Kolom - 1)
     $skip = (($startY - 1) * 5) + ($startX - 1);
 
-    // Bikin array 40 slot kosong (1 lembar TnJ 108)
     $labels = array_fill(0, 40, null);
 
-    // Masukin barang pilihan lo mulai dari titik koordinat X, Y
     $currentIndex = $skip;
     foreach ($selectedBarang as $b) {
-        if ($currentIndex < 40) { // Biar gak luber dari 1 kertas
+        if ($currentIndex < 40) {
             $labels[$currentIndex++] = $b;
         }
     }
 
+    $mm = 2.83465;
+
     $pdf = Pdf::loadView('pdf.tag_harga', compact('labels'))
-    ->setPaper([0, 0, 439, 581], 'landscape');
+    ->setPaper([0, 0, 210 * $mm, 165 * $mm], 'portrait');
 
     return $pdf->stream('tag_harga_108.pdf');
 }
