@@ -11,3 +11,5 @@
   <script src="{{ asset('assets/js/misc.js') }}"></script>
   <script src="{{ asset('assets/js/settings.js') }}"></script>
   <script src="{{ asset('assets/js/template.js') }}"></script>
+
+  @yield('scripts')

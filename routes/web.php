@@ -6,6 +6,8 @@ use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\WilayahController;
+use App\Http\Controllers\KasirController;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -46,4 +48,13 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/barang/{id_barang}', [BarangController::class, 'update'])->name('barang.update');
     Route::delete('/barang/{id_barang}', [BarangController::class, 'destroy'])->name('barang.destroy');
     Route::post('/barang/print', [BarangController::class, 'print'])->name('barang.print');
+
+    Route::get('/wilayah', [WilayahController::class, 'index'])->name('wilayah.index');
+    Route::post('/wilayah/regency', [WilayahController::class, 'getRegency'])->name('wilayah.regency');
+    Route::post('/wilayah/district', [WilayahController::class, 'getDistrict'])->name('wilayah.district');
+    Route::post('/wilayah/village', [WilayahController::class, 'getVillage'])->name('wilayah.village');
+
+    Route::get('/kasir', [KasirController::class, 'index'])->name('kasir.index');
+    Route::post('/kasir/cari-barang', [KasirController::class, 'cariBarang'])->name('kasir.cari');
+    Route::post('/kasir/bayar', [KasirController::class, 'bayar'])->name('kasir.bayar');
 });
