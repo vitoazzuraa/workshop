@@ -5,9 +5,8 @@
 
 <h2>Pencarian Wilayah</h2>
 
-{{-- Tombol Toggle --}}
 <div>
-    <button id="btn-jquery" onclick="setMode('jquery')"><strong>Ajax jQuery</strong></button>
+    <button id="btn-jquery" onclick="setMode('jquery')">Ajax jQuery</button>
     <button id="btn-axios" onclick="setMode('axios')">Axios</button>
 </div>
 

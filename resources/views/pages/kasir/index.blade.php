@@ -6,7 +6,7 @@
 <h2>Halaman Kasir</h2>
 
 <div>
-    <button id="btn-jquery" onclick="setMode('jquery')"><strong>Ajax jQuery</strong></button>
+    <button id="btn-jquery" onclick="setMode('jquery')">Ajax jQuery</button>
     <button id="btn-axios" onclick="setMode('axios')">Axios</button>
 </div>
 <p id="mode-label">Mode aktif: <strong>Ajax jQuery</strong></p>
@@ -232,6 +232,11 @@ function bayar() {
             subtotal  : parseInt($(this).attr('data-subtotal'))
         });
     });
+
+    $('#btn-bayar').prop('disabled', true).html(
+        '<span class="spinner-border spinner-border-sm"></span> Memproses...'
+    );
+
     if (activeMode === 'jquery') {
         ajaxBayar(items);
     } else {
@@ -243,7 +248,7 @@ function resetHalaman() {
     $('#tbody-kasir').html('');
     totalHarga = 0;
     $('#total-harga').text(0);
-    $('#btn-bayar').prop('disabled', true);
+    $('#btn-bayar').prop('disabled', true).html('Bayar');
     kosongkanForm();
 }
 
