@@ -1,0 +1,21 @@
+<?php
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Menu extends Model
+{
+    protected $table = 'menu';
+    protected $primaryKey = 'idmenu';
+    protected $fillable = [
+        'id',
+        'nama_menu',
+        'harga',
+        'path_gambar'
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id', 'id');
+    }
+}

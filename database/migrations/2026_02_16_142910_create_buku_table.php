@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('judul', 500);
             $table->string('pengarang', 200);
             $table->unsignedBigInteger('idkategori');
-            $table->foreign('idkategori')->references('idkategori')->on('kategoris');
+            $table->foreign('idkategori')->references('idkategori')->on('kategori');
             $table->timestamps();
         });
     }

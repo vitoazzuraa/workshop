@@ -22,11 +22,9 @@
         </a>
       </li>
 
-      <li class="nav-item {{ Request::is('barang*') ? 'active' : '' }}">
-        <a class="nav-link" href="{{ route('barang.index') }}">
-          <span class="menu-title">Manajemen Barang</span>
-          <i class="mdi mdi-cube-outline menu-icon"></i>
-        </a>
+
+      <li class="nav-item">
+        <hr style="border-top: 1px solid rgba(255,255,255,0.2); margin: 10px 20px;">
       </li>
 
       <li class="nav-item {{ Request::is('wilayah*') ? 'active' : '' }}">
@@ -36,10 +34,35 @@
         </a>
       </li>
 
+      <li class="nav-item {{ Request::is('barang*') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('barang.index') }}">
+          <span class="menu-title">Manajemen Barang</span>
+          <i class="mdi mdi-cube-outline menu-icon"></i>
+        </a>
+      </li>
+
       <li class="nav-item {{ Request::is('kasir*') ? 'active' : '' }}">
         <a class="nav-link" href="{{ route('kasir.index') }}">
           <span class="menu-title">Kasir</span>
           <i class="mdi mdi-cart menu-icon"></i>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <hr style="border-top: 1px solid rgba(255,255,255,0.2); margin: 10px 20px;">
+      </li>
+
+      <li class="nav-item {{ Request::is('menu*') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('user.menu.index') }}">
+          <span class="menu-title">Kelola Menu</span>
+          <i class="mdi mdi-food menu-icon"></i>
+        </a>
+      </li>
+
+      <li class="nav-item {{ Request::is('pesanan-masuk*') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('user.pesanan.index') }}">
+          <span class="menu-title">Pesanan Masuk</span>
+          <i class="mdi mdi-cart-arrow-down menu-icon"></i>
         </a>
       </li>
 

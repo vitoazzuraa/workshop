@@ -35,6 +35,10 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    public function menu() {
+        return $this->hasMany(Menu::class, 'id', 'id');
+    }
+
     /**
      * Get the attributes that should be cast.
      *
