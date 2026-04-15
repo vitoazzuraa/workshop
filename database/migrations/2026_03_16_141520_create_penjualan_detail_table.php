@@ -16,12 +16,12 @@ return new class extends Migration
             $table->integer('subtotal');
 
             $table->foreign('id_penjualan')
-                  ->references('id_penjualan')
-                  ->on('penjualan');
+                ->references('id_penjualan')
+                ->on('penjualan');
 
             $table->foreign('id_barang')
-                  ->references('id_barang')
-                  ->on('barang');
+                ->references('id_barang')
+                ->on('barang');
         });
     }
 

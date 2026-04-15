@@ -14,16 +14,23 @@ class MidtransWebhookController extends Controller
 
         if ($hashed == $request->signature_key) {
             $pesanan = Pesanan::where('midtrans_order_id', $request->order_id)->first();
+            
             if ($pesanan) {
                 $status = $request->transaction_status;
+                
                 if ($status == 'capture' || $status == 'settlement') {
-                    $pesanan->update(['status_bayar' => 'lunas', 'metode_bayar' => $request->payment_type]);
+                    $pesanan->update([
+                        'status_bayar' => 'lunas', 
+                        'metode_bayar' => $request->payment_type
+                    ]);
                 } elseif (in_array($status, ['deny', 'expire', 'cancel'])) {
                     $pesanan->update(['status_bayar' => 'gagal']);
                 }
+                
                 $pesanan->update(['midtrans_transaction_id' => $request->transaction_id]);
             }
         }
+        
         return response()->json(['status' => 'success']);
     }
 }

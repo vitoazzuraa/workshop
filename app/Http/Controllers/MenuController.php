@@ -2,18 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Menu;
 use App\Models\Kategori;
+use App\Models\Menu;
+use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class MenuController extends Controller
 {
+    private function getVendor()
+    {
+        return Vendor::where('user_id', Auth::id())->firstOrFail();
+    }
+
     public function index()
     {
-        $menus = Menu::where('id', Auth::id())->get();
-        return view('pages.menu.index', compact('menus'));
+        $vendor = $this->getVendor();
+        $menu = Menu::where('idvendor', $vendor->idvendor)->get();
+        return view('pages.menu.index', compact('menu'));
     }
 
     public function create()
@@ -24,10 +31,12 @@ class MenuController extends Controller
 
     public function store(Request $request)
     {
+        $vendor = $this->getVendor();
+
         $request->validate([
             'nama_menu' => 'required|string|max:100',
             'harga'     => 'required|numeric',
-            'gambar'    => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'gambar'    => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $path = null;
@@ -36,10 +45,10 @@ class MenuController extends Controller
         }
 
         Menu::create([
-            'id'          => Auth::id(),
+            'idvendor'    => $vendor->idvendor,
             'nama_menu'   => $request->nama_menu,
             'harga'       => $request->harga,
-            'path_gambar' => $path
+            'path_gambar' => $path,
         ]);
 
         return redirect()->route('user.menu.index')->with('success', 'Menu berhasil disimpan.');
@@ -47,9 +56,10 @@ class MenuController extends Controller
 
     public function edit($idmenu)
     {
-        $menu = Menu::where('idmenu', $idmenu)
-                    ->where('id', Auth::id())
-                    ->firstOrFail();
+        $vendor = $this->getVendor();
+        $menu   = Menu::where('idmenu', $idmenu)
+            ->where('idvendor', $vendor->idvendor)
+            ->firstOrFail();
 
         $kategori = Kategori::all();
         return view('pages.menu.edit', compact('menu', 'kategori'));
@@ -57,14 +67,15 @@ class MenuController extends Controller
 
     public function update(Request $request, $idmenu)
     {
-        $menu = Menu::where('idmenu', $idmenu)
-                    ->where('id', Auth::id())
-                    ->firstOrFail();
+        $vendor = $this->getVendor();
+        $menu   = Menu::where('idmenu', $idmenu)
+            ->where('idvendor', $vendor->idvendor)
+            ->firstOrFail();
 
         $request->validate([
             'nama_menu' => 'required|string|max:100',
             'harga'     => 'required|numeric',
-            'gambar'    => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'gambar'    => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $path = $menu->path_gambar;
@@ -79,7 +90,7 @@ class MenuController extends Controller
         $menu->update([
             'nama_menu'   => $request->nama_menu,
             'harga'       => $request->harga,
-            'path_gambar' => $path
+            'path_gambar' => $path,
         ]);
 
         return redirect()->route('user.menu.index')->with('success', 'Menu berhasil diupdate.');
@@ -87,9 +98,10 @@ class MenuController extends Controller
 
     public function destroy($idmenu)
     {
-        $menu = Menu::where('idmenu', $idmenu)
-                    ->where('id', Auth::id())
-                    ->firstOrFail();
+        $vendor = $this->getVendor();
+        $menu   = Menu::where('idmenu', $idmenu)
+            ->where('idvendor', $vendor->idvendor)
+            ->firstOrFail();
 
         if ($menu->path_gambar) {
             Storage::disk('public')->delete($menu->path_gambar);

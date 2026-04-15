@@ -10,19 +10,14 @@ return new class extends Migration
     {
         Schema::create('pesanan', function (Blueprint $table) {
             $table->increments('idpesanan');
-
-            $table->bigInteger('id')->unsigned();
-
+            $table->unsignedBigInteger('id')->nullable();
             $table->integer('idguest')->unsigned()->nullable();
-
             $table->integer('total');
-
             $table->enum('status_bayar', ['pending', 'lunas', 'gagal'])->default('pending');
             $table->string('metode_bayar')->nullable();
             $table->string('midtrans_order_id', 100)->unique();
             $table->string('midtrans_transaction_id')->nullable();
             $table->string('midtrans_token')->nullable();
-
             $table->timestamps();
 
             $table->foreign('id')->references('id')->on('users')->onDelete('cascade');

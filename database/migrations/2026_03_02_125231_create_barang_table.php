@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -12,12 +13,35 @@ return new class extends Migration
             $table->string('id_barang', 8)->primary();
             $table->string('nama', 50);
             $table->integer('harga');
-            $table->timestamp('timestamp');
+            $table->timestamp('timestamp')->useCurrent();
+            $table->timestamps();
         });
+
+        DB::unprepared("
+            CREATE TRIGGER trigger_id_barang
+            BEFORE INSERT ON barang
+            FOR EACH ROW
+            BEGIN
+                DECLARE nr INTEGER DEFAULT 0;
+
+                -- Hitung urutan berdasarkan tanggal hari ini
+                SET nr = (SELECT COUNT(id_barang) FROM barang
+                        WHERE DATE(timestamp) = CURDATE()) + 1;
+
+                -- Format: YYMMDDNN (8 karakter)
+                SET NEW.id_barang = CONCAT(
+                    RIGHT(YEAR(CURRENT_TIMESTAMP), 2),
+                    LPAD(MONTH(CURRENT_TIMESTAMP), 2, '0'),
+                    LPAD(DAY(CURRENT_TIMESTAMP), 2, '0'),
+                    LPAD(nr, 2, '0')
+                );
+            END
+        ");
     }
 
     public function down(): void
     {
+        DB::unprepared('DROP TRIGGER IF EXISTS trigger_id_barang');
         Schema::dropIfExists('barang');
     }
 };

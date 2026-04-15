@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Role;
+use App\Models\Vendor;
 
 class User extends Authenticatable
 {
@@ -21,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'idrole',
         'id_google',
         'otp',
     ];
@@ -35,8 +37,14 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    public function menu() {
-        return $this->hasMany(Menu::class, 'id', 'id');
+    public function peran()
+    {
+        return $this->belongsTo(Role::class, 'idrole', 'idrole');
+    }
+
+    public function profil_vendor()
+    {
+        return $this->hasOne(Vendor::class, 'user_id', 'id');
     }
 
     /**
@@ -48,7 +56,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
         ];
     }
 }

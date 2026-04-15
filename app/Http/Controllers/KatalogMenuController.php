@@ -3,19 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Menu;
-use App\Models\User;
+use App\Models\Vendor; 
 use Illuminate\Http\Request;
 
 class KatalogMenuController extends Controller
 {
     public function index(Request $request)
     {
-        $users = User::has('menu')->get();
+        $vendor = Vendor::has('menu')->get();
 
-        $menus = Menu::when($request->user_id, function($query) use ($request) {
-            return $query->where('id', $request->user_id);
+        $menu = Menu::when($request->idvendor, function($query) use ($request) {
+            return $query->where('idvendor', $request->idvendor);
         })->get();
 
-        return view('customer.index', compact('users', 'menus'));
+        return view('customer.index', compact('vendor', 'menu'));
     }
 }
