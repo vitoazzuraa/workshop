@@ -143,6 +143,14 @@
             </a>
         </li>
 
+        {{-- Kunjungan Toko --}}
+        <li class="nav-item {{ request()->routeIs('kunjungan.*') ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('kunjungan.index') }}">
+                <span class="menu-title">Kunjungan Toko</span>
+                <i class="mdi mdi-map-marker-radius menu-icon"></i>
+            </a>
+        </li>
+
         @endif {{-- end admin --}}
 
         {{-- Kantin (admin + vendor) --}}

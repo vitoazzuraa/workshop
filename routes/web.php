@@ -12,6 +12,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\JsDemoController;
 use App\Http\Controllers\KantinController;
+use App\Http\Controllers\KunjunganTokoController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\PenjualanController;
@@ -107,4 +108,11 @@ Route::middleware('check.login')->group(function () {
     // Barcode & QR Scanner
     Route::get('barcode/scan', [BarcodeController::class, 'scan'])->name('barcode.scan');
     Route::get('barcode/hasil/{kode}', [BarcodeController::class, 'hasil'])->name('barcode.hasil');
+
+    // Kunjungan Toko (Geolocation)
+    Route::get('kunjungan-toko', [KunjunganTokoController::class, 'index'])->name('kunjungan.index');
+    Route::post('kunjungan-toko', [KunjunganTokoController::class, 'store'])->name('kunjungan.store');
+    Route::get('kunjungan-toko/barcode/{barcode}', [KunjunganTokoController::class, 'cetakBarcode'])->name('kunjungan.barcode');
+    Route::get('kunjungan-toko/scan/{barcode}', [KunjunganTokoController::class, 'hasilScan'])->name('kunjungan.scan');
+    Route::delete('kunjungan-toko/{barcode}', [KunjunganTokoController::class, 'destroy'])->name('kunjungan.destroy');
 });

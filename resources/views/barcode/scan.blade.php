@@ -130,7 +130,7 @@ document.getElementById('btnStart').addEventListener('click', function () {
             });
             fetchBarang(decodedText);
         },
-        function (err) { /* scan error diabaikan */ }
+        function (err) {}
     ).then(function () {
         isScanning = true;
         document.getElementById('btnStart').style.display = 'none';
@@ -182,7 +182,7 @@ async function fetchBarang(kode) {
             document.getElementById('resHarga').textContent = 'Rp ' + parseInt(b.harga).toLocaleString('id-ID');
             document.getElementById('dataBarang').classList.remove('d-none');
             hasilEl.className = 'alert alert-success';
-            hasilEl.textContent = '✓ Barang ditemukan!';
+            hasilEl.textContent = 'Barang ditemukan.';
 
             // Tambah ke riwayat
             riwayat.unshift({ kode: b.id_barang, nama: b.nama, waktu: new Date().toLocaleTimeString('id-ID') });
@@ -190,7 +190,7 @@ async function fetchBarang(kode) {
             renderRiwayat();
         } else {
             hasilEl.className = 'alert alert-danger';
-            hasilEl.textContent = '✗ ' + res.data.message;
+            hasilEl.textContent = res.data.message;
             document.getElementById('dataBarang').classList.add('d-none');
         }
     } catch (e) {

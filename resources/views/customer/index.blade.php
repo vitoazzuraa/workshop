@@ -63,7 +63,12 @@
 @section('js-page')
 <script>
 $(function () {
-    $('#tblCustomer').DataTable({ language: { url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/id.json' } });
+    $('#tblCustomer').DataTable({
+        language: { url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/id.json' },
+        columnDefs: [
+            { orderable: false, targets: [1] }
+        ]
+    });
 });
 </script>
 @endsection

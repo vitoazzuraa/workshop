@@ -219,7 +219,12 @@
 @section('js-page')
 <script>
 $(function () {
-    $('#tblMenu').DataTable({ language: { url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/id.json' } });
+    $('#tblMenu').DataTable({
+        language: { url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/id.json' },
+        columnDefs: [
+            { orderable: false, targets: [1, -1] }
+        ]
+    });
 
     // Preview foto tambah
     $('#fotoTambah').on('change', function () {

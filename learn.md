@@ -1751,5 +1751,317 @@ Kalau kamu mau buat fitur baru dari nol, ikuti urutan ini:
 
 ---
 
+---
+
+# BAGIAN 19: GEOLOCATION — VERIFIKASI KUNJUNGAN TOKO
+
+Modul ini mengajarkan cara menggunakan GPS dari browser, menghitung jarak dua titik di bumi, dan membandingkan jarak tersebut dengan ambang batas (threshold) untuk menentukan apakah seseorang benar-benar berada di lokasi yang seharusnya.
+
+---
+
+## Apa yang Dibangun?
+
+Sebuah sistem untuk membuktikan bahwa sales benar-benar mengunjungi toko — bukan hanya mengklaim sudah datang. Caranya:
+
+1. Admin mendaftarkan toko beserta koordinat GPS-nya
+2. Setiap toko mendapat barcode unik yang dicetak dan ditempel di lokasi
+3. Sales pergi ke toko, scan barcode → sistem tahu toko mana yang dikunjungi
+4. Sales menekan "Ambil Lokasi Saya" → browser mengambil posisi GPS sales
+5. Sistem menghitung jarak antara posisi sales dan posisi toko
+6. Jika jarak cukup dekat → **DITERIMA**, jika terlalu jauh → **DITOLAK**
+
+---
+
+## Kenapa Perlu GPS Accuracy?
+
+GPS di browser tidak selalu tepat. Ada dua jenis perangkat:
+
+| Perangkat | Akurasi GPS |
+|-----------|-------------|
+| Smartphone dengan GPS aktif di luar ruangan | 5–30 meter (bagus) |
+| Laptop / PC tanpa GPS, pakai estimasi WiFi/IP | Ratusan hingga ribuan kilometer (tidak bisa dipakai) |
+
+Itulah kenapa kita tidak langsung pakai posisi pertama yang didapat. Kita menunggu hingga akurasi cukup baik, atau menggunakan posisi terbaik yang bisa didapat dalam batas waktu tertentu.
+
+---
+
+## File Baru yang Dibuat
+
+### 1. Migration — Membuat Tabel Database
+
+**File:** `database/migrations/2025_01_01_000007_create_lokasi_toko_table.php`
+
+```php
+$table->string('barcode', 8)->primary(); // PK bertipe string, bukan integer
+$table->string('nama_toko', 50);
+$table->double('latitude');              // koordinat lintang (angka desimal)
+$table->double('longitude');             // koordinat bujur (angka desimal)
+$table->double('accuracy');              // akurasi GPS dalam meter
+```
+
+**Kenapa `string` sebagai primary key?**
+Karena kode barcode berbentuk teks seperti `TK000001`, bukan angka murni. Laravel perlu tahu ini bukan angka, jadi di model kita tulis:
+```php
+protected $keyType   = 'string';
+public $incrementing = false; // jangan auto-increment, kita buat sendiri
+```
+
+**Kenapa `double`?**
+Koordinat GPS seperti `-7.250445` adalah angka desimal panjang. Tipe `double` bisa menyimpan angka desimal dengan presisi tinggi, berbeda dengan `float` yang kurang presisi untuk koordinat.
+
+---
+
+### 2. Model — `LokasiToko.php`
+
+```php
+class LokasiToko extends Model
+{
+    protected $table      = 'lokasi_toko'; // nama tabel di database
+    protected $primaryKey = 'barcode';     // kolom yang jadi primary key
+    protected $keyType    = 'string';      // tipe primary key: string, bukan int
+    public $incrementing  = false;         // kita buat kode sendiri, tidak auto
+    public $timestamps    = false;         // tidak pakai created_at/updated_at
+
+    protected $fillable = ['barcode', 'nama_toko', 'latitude', 'longitude', 'accuracy'];
+}
+```
+
+Ini sama seperti model lain di proyek ini (Vendor, Pesanan, dll.) yang juga tidak pakai `id` standar dan tidak pakai timestamps.
+
+---
+
+### 3. Controller — `KunjunganTokoController.php`
+
+**Cara membuat barcode unik secara otomatis:**
+
+```php
+public function store(Request $request)
+{
+    // Hitung ada berapa toko sekarang, lalu tambah 1
+    $count   = LokasiToko::count() + 1;
+    $barcode = 'TK' . str_pad($count, 6, '0', STR_PAD_LEFT);
+    // str_pad: tambahkan nol di kiri agar panjangnya 6 digit
+    // Hasilnya: TK000001, TK000002, TK000003, dst.
+
+    // Loop untuk menghindari duplikat jika ada toko yang sudah dihapus
+    while (LokasiToko::find($barcode)) {
+        $count++;
+        $barcode = 'TK' . str_pad($count, 6, '0', STR_PAD_LEFT);
+    }
+
+    LokasiToko::create([...]);
+}
+```
+
+**Cara mengirim gambar barcode langsung ke browser:**
+
+```php
+public function cetakBarcode($barcode)
+{
+    $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
+    $png       = $generator->getBarcode($barcode, $generator::TYPE_CODE_128);
+
+    // Kirim gambar PNG langsung sebagai response, bukan simpan ke file
+    return response($png, 200)->header('Content-Type', 'image/png');
+}
+```
+
+Ketika browser membuka URL `/kunjungan-toko/barcode/TK000001`, server langsung mengirim file gambar. Browser menampilkannya seperti membuka file gambar biasa. Bisa langsung di-print dari browser.
+
+**Cara mengirim data toko sebagai JSON (untuk AJAX):**
+
+```php
+public function hasilScan($barcode)
+{
+    $toko = LokasiToko::find($barcode);
+
+    if (!$toko) {
+        return response()->json(['status' => 'error', 'message' => 'Toko tidak ditemukan.']);
+    }
+
+    return response()->json(['status' => 'success', 'data' => $toko]);
+}
+```
+
+Ini adalah endpoint AJAX. Tidak mengembalikan halaman HTML, hanya data JSON. JavaScript di browser yang mengolah datanya.
+
+---
+
+## JavaScript — Tiga Konsep Utama
+
+### Konsep 1: Promise
+
+`getAccuratePosition()` mengembalikan sebuah **Promise**. Promise adalah "janji" bahwa sesuatu akan selesai di masa depan — dalam hal ini, mendapatkan posisi GPS.
+
+```js
+// Promise punya dua kemungkinan: berhasil (resolve) atau gagal (reject)
+function getAccuratePosition(targetAkurasi, maxTunggu) {
+    return new Promise(function (resolve, reject) {
+        // resolve = "janji terpenuhi, ini hasilnya"
+        // reject  = "janji gagal, ini alasannya"
+        navigator.geolocation.watchPosition(
+            function (posisi) {
+                // setiap kali GPS update, fungsi ini dipanggil
+                if (posisi.coords.accuracy <= targetAkurasi) {
+                    resolve(posisi); // sudah cukup akurat, selesai
+                }
+            },
+            function (error) {
+                reject(error); // GPS gagal
+            }
+        );
+    });
+}
+
+// Cara memanggil fungsi yang mengembalikan Promise:
+getAccuratePosition(50, 20000)
+    .then(function (posisi) {
+        // berhasil: posisi tersedia di sini
+        console.log(posisi.coords.latitude);
+    })
+    .catch(function (error) {
+        // gagal: tampilkan pesan error
+        alert(error.message);
+    })
+    .finally(function () {
+        // selalu dijalankan, berhasil atau gagal
+        // cocok untuk menyembunyikan loading spinner
+    });
+```
+
+**Kenapa tidak langsung pakai `navigator.geolocation.getCurrentPosition()`?**
+Karena fungsi bawaan itu hanya mengambil posisi sekali. Jika sinyal GPS sedang lemah, hasilnya bisa tidak akurat. Dengan `watchPosition`, kita terus memantau dan mengambil posisi yang paling akurat.
+
+---
+
+### Konsep 2: Formula Haversine
+
+Bumi berbentuk bulat, jadi kita tidak bisa menghitung jarak seperti menghitung jarak dua titik di kertas datar. Formula Haversine menghitung jarak di permukaan bola.
+
+```js
+function hitungJarak(lat1, lng1, lat2, lng2) {
+    var R    = 6371000; // radius bumi = 6.371 km = 6.371.000 meter
+
+    // Ubah derajat ke radian (satuan yang dipakai fungsi matematika)
+    var dLat = (lat2 - lat1) * Math.PI / 180;
+    var dLng = (lng2 - lng1) * Math.PI / 180;
+
+    // Rumus Haversine (sudah ditetapkan, tidak perlu dimengerti dari mana asalnya)
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+          + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180)
+          * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c; // hasil dalam meter
+}
+```
+
+Kamu tidak perlu memahami matematikanya dari nol. Yang penting: fungsi ini menerima dua titik koordinat dan mengembalikan jarak dalam meter.
+
+---
+
+### Konsep 3: Threshold Efektif
+
+Jika hanya membandingkan jarak dengan 300 meter, kunjungan yang sebenarnya valid bisa ditolak karena ketidakpresisian GPS.
+
+```
+Contoh nyata:
+  Sales berdiri persis di depan toko
+  Jarak aktual menurut GPS = 290 meter (harusnya 5 meter, tapi GPS kurang presisi)
+  Toko accuracy = 30 meter (saat titik toko diambil, akurasinya 30 meter)
+  Sales accuracy = 20 meter (GPS sales kurang presisi)
+
+  Threshold efektif = 300 + 30 + 20 = 350 meter
+  290 ≤ 350 → DITERIMA (benar, sales memang di toko)
+
+  Tanpa threshold efektif:
+  290 ≤ 300 → DITERIMA (kebetulan masih lolos, tapi tidak selalu begini)
+  Jika jarak terbaca 310 meter padahal sales ada di toko → DITOLAK (salah)
+```
+
+```js
+var batas       = 300;
+var thresholdEf = batas + parseFloat(tokoSaatIni.accuracy) + akurasiSales;
+var diterima    = jarak <= thresholdEf;
+```
+
+---
+
+## Alur Data: Dari Scan ke Keputusan
+
+```
+1. Sales klik "Mulai Scan"
+   → html5-qrcode mengaktifkan kamera
+   → Kamera baca barcode "TK000001"
+   → bunyikanBeep()
+
+2. Browser kirim AJAX ke server
+   GET /kunjungan-toko/scan/TK000001
+   → Server cari di database: SELECT * FROM lokasi_toko WHERE barcode = 'TK000001'
+   → Server kirim balik JSON: { latitude: -7.250, longitude: 112.768, accuracy: 15 }
+
+3. Browser tampilkan data toko di tabel
+   → tokoSaatIni = data JSON yang diterima (disimpan di variabel JavaScript)
+
+4. Sales klik "Ambil Lokasi Saya"
+   → getAccuratePosition(50, 20000) dijalankan
+   → Browser minta izin GPS ke user
+   → Tunggu sinyal GPS yang cukup akurat (maks 20 detik)
+   → Dapat: { latitude: -7.251, longitude: 112.769, accuracy: 18 }
+
+5. Hitung jarak
+   → hitungJarak(tokoLat, tokoLng, salesLat, salesLng) → misal: 180 meter
+   → threshold = 300 + 15 + 18 = 333 meter
+   → 180 ≤ 333 → DITERIMA
+
+6. Tampilkan hasil di halaman
+   → $('#kotakHasil').addClass('alert-success')
+   → $('#teksHasil').text('DITERIMA')
+```
+
+---
+
+## Guard Akurasi — Kenapa Perlu?
+
+Tanpa guard, skenario berikut bisa terjadi:
+
+```
+Sales pakai laptop di rumah (500 km dari toko)
+Browser laporkan accuracy = 2.000.000 meter (2000 km, karena estimasi IP)
+Jarak aktual = 500.000 meter (500 km)
+Threshold = 300 + 15 + 2.000.000 = 2.000.315 meter
+500.000 ≤ 2.000.315 → DITERIMA (salah besar!)
+```
+
+Solusinya: jika akurasi GPS terlalu buruk (lebih dari 500 meter), langsung tolak sebelum hitung jarak.
+
+```js
+if (akurasiSales > 500) {
+    alert('Akurasi GPS terlalu rendah. Gunakan perangkat dengan GPS aktif.');
+    return; // hentikan fungsi, jangan lanjut hitung
+}
+```
+
+Perangkat dengan GPS nyata (smartphone di luar ruangan) hampir selalu menghasilkan akurasi di bawah 30 meter, jauh di bawah batas 500 meter.
+
+---
+
+## Ringkasan Pola yang Dipelajari
+
+| Pola | Digunakan Di |
+|------|-------------|
+| Primary key berupa string | Model `LokasiToko` |
+| Generate kode unik di PHP | `KunjunganTokoController::store()` |
+| Kirim gambar langsung dari controller | `cetakBarcode()` |
+| AJAX untuk ambil data toko | `tampilkanDataToko()` di view |
+| Promise + `.then().catch().finally()` | `getAccuratePosition()` |
+| GPS `watchPosition` vs `getCurrentPosition` | `getAccuratePosition()` |
+| Formula Haversine | `hitungJarak()` |
+| Threshold efektif GPS | Perhitungan verifikasi |
+| Guard akurasi GPS | Sebelum hitung jarak |
+
+---
+
 *Dokumen ini ditulis berdasarkan proyek di: `C:\laragon\www\framework`*  
 *Setiap konsep dijelaskan dengan "kenapa" bukan hanya "apa".*
